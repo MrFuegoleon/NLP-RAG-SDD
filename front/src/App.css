@@ -1,0 +1,339 @@
+/* RESET & GLOBAL */
+:root {
+  --bg-dark: #343541; /* Main Chat Background */
+  --bg-sidebar: #202123; /* Sidebar Background */
+  --bg-input: #40414f; /* Input Bar Background */
+  --text-main: #ececf1;
+  --text-secondary: #8e8ea0;
+  --border: #565869;
+  --primary: #19c37d; /* OpenAI Green */
+}
+
+body,
+html,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Segoe UI", sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  overflow: hidden; /* Prevents double scrollbars */
+}
+
+/* MAIN LAYOUT: Flex Row (Sidebar | Content) */
+.fullscreen-layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* --- SIDEBAR STYLING --- */
+.sidebar {
+  width: 260px; /* Fixed width */
+  background-color: var(--bg-sidebar);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #4d4d4f;
+  flex-shrink: 0; 
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+.section-title:first-child {
+  margin-top: 0;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.input-group input {
+  background: transparent;
+  border: none;
+  color: white;
+  margin-left: 10px;
+  width: 100%;
+  outline: none;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.history-item:hover {
+  background-color: #2a2b32;
+}
+
+.icon-btn-small {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn-small:hover {
+  color: var(--text-main);
+}
+
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.85rem;
+}
+.status-online {
+  color: var(--primary);
+}
+
+/* --- MAIN CONTENT AREA --- */
+.main-content {
+  flex: 1; /* Takes remaining width */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  width: 100%; /* Ensure it fills width */
+}
+
+/* Chat Scroll Area */
+.chat-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 40px; /* More horizontal padding */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  scroll-behavior: smooth;
+  
+  /* CHANGED: Removed max-width restriction */
+  width: 100%; 
+  max-width: 100%; 
+  box-sizing: border-box;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 15vh;
+}
+.empty-state h1 {
+  margin-bottom: 10px;
+}
+
+/* Message Bubbles */
+.message {
+  display: flex;
+  width: 100%;
+}
+.message.user {
+  justify-content: flex-end;
+}
+.message.bot {
+  justify-content: flex-start;
+}
+
+.message-bubble {
+  padding: 15px 20px;
+  border-radius: 12px;
+  
+  /* You can increase this to 90% or 100% if you want bubbles to be wider too */
+  max-width: 85%; 
+  
+  line-height: 1.5;
+}
+
+.message.user .message-bubble {
+  background-color: #40414f; 
+  border-top-right-radius: 2px;
+}
+
+.message.bot .message-bubble {
+  background-color: transparent; 
+  border-left: 4px solid var(--primary);
+  padding-left: 15px;
+}
+
+.msg-files {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- INPUT AREA (Fixed Bottom) --- */
+.input-area {
+  padding: 20px 40px; /* Match chat container padding */
+  background: linear-gradient(180deg, rgba(53, 53, 65, 0), #343541 20%);
+  
+  /* CHANGED: Full width */
+  width: 100%;
+  max-width: 100%;
+  
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.file-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.file-chip {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.file-chip button {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+}
+
+.input-bar {
+  background-color: var(--bg-input);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  align-items: flex-end; 
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.input-bar textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: none;
+  max-height: 200px;
+  height: 24px; 
+  outline: none;
+}
+
+.icon-btn,
+.send-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.send-btn {
+  background-color: var(--primary);
+  color: white;
+  margin-left: 8px;
+}
+.send-btn:disabled {
+  background-color: transparent;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.disclaimer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 10px;
+}
+
+/* ========================================= */
+/*       SCROLLBARS & MESSAGES              */
+/* ========================================= */
+
+/* Hide Scrollbars but keep functionality */
+.chat-container::-webkit-scrollbar, 
+.input-bar textarea::-webkit-scrollbar {
+  display: none;
+}
+.chat-container, 
+.input-bar textarea {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Message Text Wrapping */
+.msg-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+}
+
+/* Source Card Styling */
+.msg-sources {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  font-size: 0.9em;
+}
+
+.source-item {
+  margin-top: 5px;
+  background: rgba(0,0,0,0.05);
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.source-item p {
+  margin: 0;
+}
+
+.source-label {
+  font-weight: bold;
+}
