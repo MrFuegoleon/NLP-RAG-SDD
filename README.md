@@ -218,7 +218,7 @@ Document: histoire_des_idees_geopolitiques-2
 Page: 9
 ```
 
-![Exemple de résultat](./1764527960144_image.png)
+![Exemple de résultat](image.png)
 
 ## ⚙️ Configuration
 
