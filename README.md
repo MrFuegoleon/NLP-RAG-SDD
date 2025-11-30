@@ -2,7 +2,7 @@
 
 Un assistant conversationnel intelligent spécialisé en géopolitique, utilisant la technologie RAG (Retrieval-Augmented Generation) pour fournir des réponses précises basées sur des documents académiques.
 
-![Demo du chatbot](./docs/demo.png)
+![Demo du chatbot](./image.png)
 
 ## 📋 Table des matières
 
@@ -41,7 +41,7 @@ Ce projet implémente un système RAG (Retrieval-Augmented Generation) permettan
 
 Le système a été évalué avec le framework **RAGAS** (Retrieval-Augmented Generation Assessment) sur un dataset de questions géopolitiques. Voici les résultats :
 
-![Résultats RAGAS](./1764534728149_WhatsApp_Image_2025-11-29_at_20_07_22_54cba138.jpg)
+![Résultats RAGAS](resutats_evaluation.png)
 
 ### Métriques RAGAS
 
@@ -261,6 +261,11 @@ Voici quelques questions que vous pouvez poser au chatbot :
 - Quelles sont les différences entre géopolitique et géostratégie ?
 - Expliquez la théorie du Rimland de Spykman
 - Quel est le rôle de la géographie dans les conflits internationaux ?
+
+### 💡✨ Étape 2-3 : Pour lancer le frontend et le backend d'un coup:
+```
+python cli.py dev
+```
 
 ## 🔧 Troubleshooting
 
