@@ -1,0 +1,235 @@
+import os
+import json
+from pathlib import Path
+
+import yaml
+from openai import OpenAI  # Changé de mistralai vers openai
+from Indexation import Indexation
+from doc_search import DocumentRetriever  
+
+from dotenv import load_dotenv
+load_dotenv()
+
+class RagLLM:
+    """
+    Classe RAG + LLM (Grok via OpenRouter) :
+    - récupère le contexte via le retriever (Chroma)
+    - construit le prompt à partir du contexte + historique
+    - appelle le LLM Grok via OpenRouter (OpenAI-compatible)
+    - sauvegarde les N dernières questions / réponses dans history.json
+    """
+
+    def __init__(self, config_file: str = "config.yaml",api_key: str =""):
+        # Dossier de base = dossier où se trouve ce fichier
+        self.base_dir = Path(__file__).resolve().parent
+
+        # ---------- 1) Charger la config ----------
+        config_path = self.base_dir / config_file
+        if not config_path.exists():
+            raise FileNotFoundError(f"Config file not found: {config_path}")
+
+        with open(config_path, "r", encoding="utf-8") as f:
+            self.config = yaml.safe_load(f)
+
+        # --- partie LLM ---
+        llm_cfg = self.config.get("llm", {})
+        self.model_name = llm_cfg.get("model", "x-ai/grok-4.1-fast:free")  # Par défaut Grok récent
+        #api_key_env = llm_cfg.get("api_key_env", "OPENROUTER_API_KEY")  
+        self.api_key_env = api_key
+        os.environ["OPENROUTER_API_KEY"] = self.api_key_env
+        self.history_size = llm_cfg.get("history_size", 5)
+        self.temperature = llm_cfg.get("temperature", 0.2)
+        self.max_tokens = llm_cfg.get("max_tokens", 2048)  # Adapté pour Grok
+        self.top_p = llm_cfg.get("top_p", 0.95)
+        self.random_seed = llm_cfg.get("random_seed", None)
+        # Optionnel : raisonnement (pour Grok 4+)
+        self.enable_reasoning = llm_cfg.get("reasoning", False)
+
+        self.api_key = os.getenv("OPENROUTER_API_KEY")
+        if not self.api_key:
+            raise ValueError(
+                f"Clé API OpenRouter manquante. "
+                f"Définis la variable d'environnement {self.api_key_env} dans .env."
+            )
+
+        # --- partie retriever ---
+        retr_cfg = self.config.get("retriever", {})
+        # nombre max de candidats retournés par Chroma
+        self.retr_k = retr_cfg.get("k", 20)
+        # distance cosine max acceptée (plus petit = plus pertinent) - ajusté pour embeddings
+        self.retr_threshold = retr_cfg.get("threshold", 0.3)  # Note : pour cosine, <0.5 est strict
+
+        # --- partie prompt ---
+        prompt_cfg = self.config.get("prompt", {})
+        # template avec {question}, {context}, {history}
+        self.prompt_template = prompt_cfg.get("template", "{context}\n\n{question}")
+
+        # ---------- 2) Initialiser le client OpenAI (pour OpenRouter) ----------
+        # client persistant avec base_url pour OpenRouter
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=self.api_key
+        )
+
+        # ---------- 3) Charger le vectorstore + créer le retriever ----------
+        self.indexer = Indexation(config_file=config_file)
+        vectorstore = self.indexer.load_vectorstore()
+        self.retriever = DocumentRetriever(vector_store=vectorstore)
+
+        # ---------- 4) Gestion de l'historique ----------
+        self.history_path = self.base_dir / "history.json"
+        self.history = self._load_history()
+
+    # =======================
+    #    HISTORIQUE
+    # =======================
+
+    def _load_history(self):
+        if self.history_path.exists():
+            try:
+                with open(self.history_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                # fichier corrompu → on repart de zéro
+                return []
+        return []
+
+    def _save_history(self):
+        with open(self.history_path, "w", encoding="utf-8") as f:
+            json.dump(self.history, f, ensure_ascii=False, indent=2)
+
+    def _update_history(self, question: str, answer: str):
+        """
+        Ajoute la Q/R à l'historique et tronque à history_size.
+        """
+        self.history.append({"question": question, "answer": answer})
+        if len(self.history) > self.history_size:
+            self.history = self.history[-self.history_size :]
+        self._save_history()
+
+    def _format_history(self) -> str:
+        """
+        Formate l'historique pour l'injecter dans le prompt.
+        """
+        if not self.history:
+            return ""
+        parts = []
+        for item in self.history:
+            parts.append(f"Q: {item['question']}\nR: {item['answer']}")
+        return "Historique des échanges récents :\n" + "\n\n".join(parts)
+
+    # =======================
+    #    CONTEXTE (via retriever)
+    # =======================
+    def _build_context_from_retriever(self, question: str):
+        """
+        Utilise le retriever pour récupérer TOUS les chunks pertinents
+        et renvoie à la fois le contexte concaténé et la liste des docs.
+        """
+        docs = self.retriever.retrieve_by_score_threshold(
+            query=question,
+            threshold=self.retr_threshold,
+            k=self.retr_k,
+        )
+
+        if not docs:
+            return "Aucun contexte pertinent n'a été trouvé dans les documents.", []
+
+        context = "\n\n".join(d.page_content for d in docs)
+        return context, docs
+
+    def _build_prompt(self, question: str, context: str) -> str:
+        """
+        Construit le prompt final en injectant :
+        - l'historique formaté
+        - le contexte généré par le retriever
+        - la question utilisateur
+        """
+        history_text = self._format_history()
+
+        prompt = self.prompt_template.format(
+            question=question,
+            context=context,
+            history=history_text,
+        )
+        return prompt
+
+    # =======================
+    #    APPEL LLM (Grok via OpenRouter)
+    # =======================
+    def _call_llm(self, prompt: str) -> str:
+        """
+        Appelle le modèle Grok via OpenRouter avec les paramètres définis dans config.yaml
+        """
+        messages = [
+            {"role": "user", "content": prompt}
+        ]
+
+        # Params pour l'appel
+        params = {
+            "model": self.model_name,
+            "messages": messages,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+            "top_p": self.top_p,
+            "stream": False,
+        }
+        if self.random_seed:
+            params["seed"] = self.random_seed  # Note : 'seed' au lieu de 'random_seed' pour OpenAI
+
+        # Optionnel : activer raisonnement pour Grok 4+
+        if self.enable_reasoning:
+            params["reasoning"] = {"enabled": True}  # Ou via extra_headers si besoin
+
+        try:
+            response = self.client.chat.completions.create(**params)
+            return response.choices[0].message.content
+        except Exception as e:
+            # Gestion d'erreurs courantes (quotas, modèle invalide)
+            if "rate limit" in str(e).lower():
+                raise ValueError("Quota OpenRouter dépassé. Ajoutez des crédits sur openrouter.ai.")
+            elif "model not found" in str(e).lower():
+                raise ValueError(f"Modèle '{self.model_name}' non trouvé. Vérifiez sur openrouter.ai/models?q=grok")
+            else:
+                raise ValueError(f"Erreur appel LLM : {e}")
+
+    # =======================
+    #    PIPELINE RAG COMPLET
+    # =======================
+
+    def ask(self, question: str):
+        context, docs = self._build_context_from_retriever(question)
+        prompt = self._build_prompt(question, context)
+        answer = self._call_llm(prompt)
+        self._update_history(question, answer)
+
+        # déduplication des sources (document_name, page)
+        seen = set()
+        sources = []
+        for d in docs:
+            key = (d.metadata.get("document_name"), d.metadata.get("page"))
+            if key in seen:
+                continue
+            seen.add(key)
+            sources.append({
+                "source": d.metadata.get("source"),
+                "document_name": key[0],
+                "page": key[1],
+            })
+
+        return answer, sources
+    
+if __name__ == "__main__":
+    rag_llm = RagLLM("config.yaml")
+
+    #question = "Qu'est-ce que la géopolitique ?"
+    question = "Quelle est la théorie du Heartland de Mackinder ?"
+    answer, sources = rag_llm.ask(question)
+
+    print("Q :", question)
+    print("\nR :", answer)
+
+    print("\nSources utilisées :")
+    for s in sources:
+        print(f"- {s['document_name']} (page {s['page']})")
+        print(f"  chemin : {s['source']}")
