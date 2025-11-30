@@ -65,11 +65,13 @@ NLP-RAG-SDD/
 ### Installation de Poetry
 
 **Linux, macOS, Windows (WSL)**
+
 ```bash
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
 **Windows (PowerShell)**
+
 ```powershell
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 ```
@@ -116,6 +118,7 @@ Vous obtiendrez un chemin d'activation similaire à :
 **Copiez et collez ce chemin dans votre terminal** pour activer l'environnement.
 
 Vous verrez alors le préfixe :
+
 ```
 (rag-sdd-py3.12) C:\Users\VotreNom\...\NLP-RAG-SDD>
 ```
@@ -129,6 +132,7 @@ python app.py
 ```
 
 Vous devriez voir :
+
 ```
 * Running on http://127.0.0.1:5000
 * Debug mode: on
@@ -147,6 +151,7 @@ npm run dev
 ```
 
 Vous verrez :
+
 ```
   ➜  Local:   http://localhost:5173/
 ```
@@ -156,18 +161,16 @@ Vous verrez :
 ### Étape 4 : Utiliser l'application
 
 1. **Ouvrez votre navigateur** à l'adresse : `http://localhost:5173/`
-
 2. **Entrez votre clé API OpenRouter** dans le champ de configuration de l'interface :
-   
+
    Pour obtenir votre clé API gratuite, rendez-vous sur [openrouter.ai](https://openrouter.ai) et créez un compte.
-   
+
    **Clé de démonstration fournie** :
+
    ```
    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
    ```
-
 3. **Uploadez vos documents PDF** (optionnel si des documents existent déjà dans `/data`)
-
 4. **Posez vos questions** sur la géopolitique !
 
 ### Exemple de question
@@ -177,11 +180,12 @@ Quelle est la théorie du Heartland de Mackinder ?
 ```
 
 **Réponse attendue** :
+
 ```
-La théorie du Heartland de Halford Mackinder est décrite dans le contexte comme suit. 
-Halford Mackinder, géopoliticien anglais emblématique, publie en 1904 un ouvrage où 
-il démontre que le heartland est la source principale des rivalités entre les pays du 
-monde. Ce heartland comprend la partie continentale de l'Eurasie, avec pour centre 
+La théorie du Heartland de Halford Mackinder est décrite dans le contexte comme suit.
+Halford Mackinder, géopoliticien anglais emblématique, publie en 1904 un ouvrage où
+il démontre que le heartland est la source principale des rivalités entre les pays du
+monde. Ce heartland comprend la partie continentale de l'Eurasie, avec pour centre
 la Russie...
 
 Sources:
@@ -199,12 +203,14 @@ Page: 9
 Le fichier `config.yaml` permet de personnaliser le comportement du système :
 
 ### Paramètres de chunking
+
 ```yaml
 chunk_size: 1200        # Taille des chunks de texte
 chunk_overlap: 300      # Chevauchement entre chunks
 ```
 
 ### Modèle LLM
+
 ```yaml
 llm:
   model: x-ai/grok-4.1-fast:free
@@ -213,6 +219,7 @@ llm:
 ```
 
 ### Retriever
+
 ```yaml
 retriever:
   k: 15                 # Nombre de chunks récupérés
@@ -238,13 +245,15 @@ Voici quelques questions que vous pouvez poser au chatbot :
 ### Problème : "Vectorstore not found"
 
 **Solution** : Indexez vos documents d'abord :
+
 ```bash
-python Indexation.py
+python indexation.py
 ```
 
 ### Problème : Port 5000 déjà utilisé
 
 **Solution** : Modifiez le port dans `app.py` :
+
 ```python
 app.run(debug=True, port=5001)  # Utilisez 5001 au lieu de 5000
 ```
@@ -252,6 +261,7 @@ app.run(debug=True, port=5001)  # Utilisez 5001 au lieu de 5000
 ### Problème : Erreur npm/node
 
 **Solution** : Vérifiez votre version de Node.js :
+
 ```bash
 node --version  # Devrait être 16+
 npm --version
@@ -260,6 +270,7 @@ npm --version
 ### Problème : "Module not found"
 
 **Solution** : Réinstallez les dépendances :
+
 ```bash
 poetry install
 cd front && npm install
@@ -270,7 +281,7 @@ cd front && npm install
 1. Placez vos fichiers PDF dans le dossier `/data`
 2. Relancez l'indexation :
    ```bash
-   python Indexation.py
+   python indexation.py
    ```
 3. Les nouveaux documents seront automatiquement intégrés au vectorstore
 
