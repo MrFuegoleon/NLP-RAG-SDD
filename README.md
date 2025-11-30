@@ -262,6 +262,11 @@ Voici quelques questions que vous pouvez poser au chatbot :
 - Expliquez la théorie du Rimland de Spykman
 - Quel est le rôle de la géographie dans les conflits internationaux ?
 
+### 💡✨ Étape 2-3 : Pour lancer le frontend et le backend d'un coup:
+```
+python cli.py dev
+```
+
 ## 🔧 Troubleshooting
 
 ### Problème : "API key not found"
