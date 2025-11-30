@@ -2,7 +2,7 @@
 
 Un assistant conversationnel intelligent spécialisé en géopolitique, utilisant la technologie RAG (Retrieval-Augmented Generation) pour fournir des réponses précises basées sur des documents académiques.
 
-![Demo du chatbot](image.png)
+![Demo du chatbot](./docs/demo.png)
 
 ## 📋 Table des matières
 
@@ -41,7 +41,7 @@ Ce projet implémente un système RAG (Retrieval-Augmented Generation) permettan
 
 Le système a été évalué avec le framework **RAGAS** (Retrieval-Augmented Generation Assessment) sur un dataset de questions géopolitiques. Voici les résultats :
 
-![Résultats RAGAS](resutats_evaluation.png)
+![Résultats RAGAS](./1764534728149_WhatsApp_Image_2025-11-29_at_20_07_22_54cba138.jpg)
 
 ### Métriques RAGAS
 
@@ -91,13 +91,11 @@ NLP-RAG-SDD/
 ### Installation de Poetry
 
 **Linux, macOS, Windows (WSL)**
-
 ```bash
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
 **Windows (PowerShell)**
-
 ```powershell
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 ```
@@ -144,7 +142,6 @@ Vous obtiendrez un chemin d'activation similaire à :
 **Copiez et collez ce chemin dans votre terminal** pour activer l'environnement.
 
 Vous verrez alors le préfixe :
-
 ```
 (rag-sdd-py3.12) C:\Users\VotreNom\...\NLP-RAG-SDD>
 ```
@@ -158,7 +155,6 @@ python app.py
 ```
 
 Vous devriez voir :
-
 ```
 * Running on http://127.0.0.1:5000
 * Debug mode: on
@@ -177,26 +173,34 @@ npm run dev
 ```
 
 Vous verrez :
-
 ```
   ➜  Local:   http://localhost:5173/
 ```
 
 ✅ **L'interface est accessible !**
 
-### Étape 4 : Utiliser l'application
+### Étape 4 : Obtenir votre clé API OpenRouter
+
+Avant d'utiliser l'application, vous devez créer votre clé API gratuite sur OpenRouter :
+
+1. **Cliquez sur ce lien** : [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys)
+
+
+
+2. **Cliquez sur "Create API Key"** pour générer votre clé
+
+   ![Section API Keys](./open.png)
+
+3. **Copiez votre clé** (elle commence par `sk-or-v1-...`)
+
+### Étape 5 : Utiliser l'application
 
 1. **Ouvrez votre navigateur** à l'adresse : `http://localhost:5173/`
-2. **Entrez votre clé API OpenRouter** dans le champ de configuration de l'interface :
 
-   Pour obtenir votre clé API gratuite, rendez-vous sur [openrouter.ai](https://openrouter.ai) et créez un compte.
+2. **Collez votre clé API OpenRouter** dans le champ de configuration de l'interface
 
-   **Clé de démonstration fournie** :
-
-   ```
-   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
-   ```
 3. **Uploadez vos documents PDF** (optionnel si des documents existent déjà dans `/data`)
+
 4. **Posez vos questions** sur la géopolitique !
 
 ### Exemple de question
@@ -206,12 +210,11 @@ Quelle est la théorie du Heartland de Mackinder ?
 ```
 
 **Réponse attendue** :
-
 ```
-La théorie du Heartland de Halford Mackinder est décrite dans le contexte comme suit.
-Halford Mackinder, géopoliticien anglais emblématique, publie en 1904 un ouvrage où
-il démontre que le heartland est la source principale des rivalités entre les pays du
-monde. Ce heartland comprend la partie continentale de l'Eurasie, avec pour centre
+La théorie du Heartland de Halford Mackinder est décrite dans le contexte comme suit. 
+Halford Mackinder, géopoliticien anglais emblématique, publie en 1904 un ouvrage où 
+il démontre que le heartland est la source principale des rivalités entre les pays du 
+monde. Ce heartland comprend la partie continentale de l'Eurasie, avec pour centre 
 la Russie...
 
 Sources:
@@ -222,21 +225,19 @@ Document: histoire_des_idees_geopolitiques-2
 Page: 9
 ```
 
-![Exemple de résultat](image.png)
+![Exemple de résultat](./1764527960144_image.png)
 
 ## ⚙️ Configuration
 
 Le fichier `config.yaml` permet de personnaliser le comportement du système :
 
 ### Paramètres de chunking
-
 ```yaml
 chunk_size: 1200        # Taille des chunks de texte
 chunk_overlap: 300      # Chevauchement entre chunks
 ```
 
 ### Modèle LLM
-
 ```yaml
 llm:
   model: x-ai/grok-4.1-fast:free
@@ -245,7 +246,6 @@ llm:
 ```
 
 ### Retriever
-
 ```yaml
 retriever:
   k: 15                 # Nombre de chunks récupérés
@@ -262,11 +262,6 @@ Voici quelques questions que vous pouvez poser au chatbot :
 - Expliquez la théorie du Rimland de Spykman
 - Quel est le rôle de la géographie dans les conflits internationaux ?
 
-### 💡✨ Étape 2-3 : Pour lancer le frontend et le backend d'un coup:
-```
-python cli.py dev
-```
-
 ## 🔧 Troubleshooting
 
 ### Problème : "API key not found"
@@ -276,15 +271,13 @@ python cli.py dev
 ### Problème : "Vectorstore not found"
 
 **Solution** : Indexez vos documents d'abord :
-
 ```bash
-python indexation.py
+python Indexation.py
 ```
 
 ### Problème : Port 5000 déjà utilisé
 
 **Solution** : Modifiez le port dans `app.py` :
-
 ```python
 app.run(debug=True, port=5001)  # Utilisez 5001 au lieu de 5000
 ```
@@ -292,7 +285,6 @@ app.run(debug=True, port=5001)  # Utilisez 5001 au lieu de 5000
 ### Problème : Erreur npm/node
 
 **Solution** : Vérifiez votre version de Node.js :
-
 ```bash
 node --version  # Devrait être 16+
 npm --version
@@ -301,7 +293,6 @@ npm --version
 ### Problème : "Module not found"
 
 **Solution** : Réinstallez les dépendances :
-
 ```bash
 poetry install
 cd front && npm install
@@ -312,7 +303,7 @@ cd front && npm install
 1. Placez vos fichiers PDF dans le dossier `/data`
 2. Relancez l'indexation :
    ```bash
-   python indexation.py
+   python Indexation.py
    ```
 3. Les nouveaux documents seront automatiquement intégrés au vectorstore
 
