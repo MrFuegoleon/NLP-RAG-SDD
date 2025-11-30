@@ -194,7 +194,7 @@ Vous verrez :
    **Clé de démonstration fournie** :
 
    ```
-   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
+   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
    ```
 3. **Uploadez vos documents PDF** (optionnel si des documents existent déjà dans `/data`)
 4. **Posez vos questions** sur la géopolitique !
