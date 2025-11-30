@@ -37,6 +37,32 @@ Ce projet implémente un système RAG (Retrieval-Augmented Generation) permettan
 - ⚡ **API REST** pour intégration facile
 - 🔐 **Gestion sécurisée** des clés API
 
+## 📊 Performance et Évaluation
+
+Le système a été évalué avec le framework **RAGAS** (Retrieval-Augmented Generation Assessment) sur un dataset de questions géopolitiques. Voici les résultats :
+
+![Résultats RAGAS](resutats_evaluation.png)
+
+### Métriques RAGAS
+
+| Métrique | Score | Niveau |
+|----------|-------|--------|
+| **Faithfulness** | 0.7143 | SOLIDE |
+| **Answer Relevancy** | 0.6367 | SOLIDE |
+| **Context Precision** | 0.9365 | ÉLITE |
+| **Context Recall** | 0.6667 | SOLIDE |
+
+**Score Global RAGAS : 0.7385** → **UN PEU SOLIDE**
+
+### Interprétation des résultats
+
+- ✅ **Context Precision (0.9365)** : Le système excelle dans la sélection des chunks pertinents
+- ✅ **Faithfulness (0.7143)** : Les réponses sont généralement fidèles aux documents sources
+- ⚠️ **Answer Relevancy (0.6367)** : Les réponses sont pertinentes mais peuvent être améliorées
+- ⚠️ **Context Recall (0.6667)** : Le système récupère la plupart des informations nécessaires
+
+Ces résultats démontrent que le système RAG fournit des réponses fiables et bien contextualisées, avec une excellente précision dans la sélection des sources.
+
 ## 🏗️ Architecture
 
 ```
