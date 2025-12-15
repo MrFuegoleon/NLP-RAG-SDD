@@ -26,7 +26,7 @@ class RagLLM:
             self.config = yaml.safe_load(f)
 
         llm_cfg = self.config.get("llm", {})
-        self.model_name = llm_cfg.get("model", "x-ai/grok-4.1-fast:free")
+        self.model_name = llm_cfg.get("model", "nex-agi/deepseek-v3.1-nex-n1:free")
         self.history_size = llm_cfg.get("history_size", 5)
         self.temperature = llm_cfg.get("temperature", 0.2)
         self.max_tokens = llm_cfg.get("max_tokens", 2048)

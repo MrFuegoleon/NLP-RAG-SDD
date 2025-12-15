@@ -19,7 +19,7 @@ device: "cpu"
 normalize_embeddings: true
 
 llm:
-  model: x-ai/grok-4.1-fast:free
+  model: nex-agi/deepseek-v3.1-nex-n1:free
   api_key_env: OPENROUTER_API_KEY
   history_size: 0
   temperature: 0.2
